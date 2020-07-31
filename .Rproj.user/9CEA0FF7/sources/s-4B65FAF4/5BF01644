@@ -1,0 +1,32 @@
+{
+    "id": "5BF01644",
+    "path": null,
+    "project_path": null,
+    "type": "r_dataframe",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1595914806339.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "expression": "full_beer_data",
+        "caption": "full_beer_data",
+        "totalObservations": "1100",
+        "displayedObservations": "1100",
+        "variables": "6",
+        "cacheKey": "BC12DF6B",
+        "object": "full_beer_data",
+        "environment": "",
+        "contentUrl": "grid_resource/gridviewer.html?env=&obj=full_beer_data&cache_key=BC12DF6B&max_cols=50",
+        "preview": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 8533869541156725345,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1595914806339,
+    "read_only": false,
+    "read_only_alternatives": []
+}
