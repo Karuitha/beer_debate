@@ -8,42 +8,31 @@ library(tidyverse)
 library(rvest)
 library(ggthemes)
 library(plotly)
+library(GGally)
+
+# Write a scrapping function ----
+scraper <- function(x){
+  read_html(x) %>% 
+    html_nodes("table") %>% 
+    html_table() %>% 
+    .[[1]]
+}
 
 # scrape the data ----
 # Top 250
-url <- "https://www.beeradvocate.com/beer/top-rated/"
-top_250 <- read_html(url) %>% 
-  html_nodes("table") %>% 
-  html_table() %>% 
-  .[[1]]
+top_250 <- scraper("https://www.beeradvocate.com/beer/top-rated/")
 
 # Trending 100
-url2 <- "https://www.beeradvocate.com/beer/trending/"
-trend_100 <- read_html(url2) %>% 
-  html_nodes("table") %>% 
-  html_table() %>% 
-  .[[1]]
+trend_100 <- scraper("https://www.beeradvocate.com/beer/trending/")
 
 # New beers 
-url3 <- "https://www.beeradvocate.com/beer/top-new/"
-new_beers <- read_html(url3) %>% 
-  html_nodes("table") %>% 
-  html_table() %>% 
-  .[[1]]
+new_beers <- scraper("https://www.beeradvocate.com/beer/top-new/")
 
-# Fame beer 
-url4 <- "https://www.beeradvocate.com/beer/fame/"
-fame_beers <- read_html(url4) %>% 
-  html_nodes("table") %>% 
-  html_table() %>% 
-  .[[1]]
+# Fame beer
+fame_beers <- scraper("https://www.beeradvocate.com/beer/fame/")
 
 # Popular beer 
-url5 <- "https://www.beeradvocate.com/beer/popular/"
-popular_beers <- read_html(url5) %>% 
-  html_nodes("table") %>% 
-  html_table() %>% 
-  .[[1]]
+popular_beers <- scraper("https://www.beeradvocate.com/beer/popular/")
 
 # Rename columns and drop first row ----
 # Top 250
@@ -278,6 +267,16 @@ full_beer_data$type <- ifelse(is.na(full_beer_data$type) &
                               "California Common / Steam Beer", 
                               full_beer_data$type)
 
+###################################################################################
+## Add beer category light, medium, strong----
+full_beer_data$category <- case_when(
+  full_beer_data$alcohol_percent <= 8 ~ "lite",
+  full_beer_data$alcohol_percent > 8 & 
+    full_beer_data$alcohol_percent <= 16 ~ "medium",
+  full_beer_data$alcohol_percent > 16 ~ "strong")
+
+ggplotly(full_beer_data %>% ggplot(aes(y = average_ratings, 
+                              x = category, fill = category)) + geom_boxplot())
 
 ######################################################################################
 ## Add column for subtype and clean dataset ----
@@ -294,6 +293,8 @@ full_beer_data$type <- factor(full_beer_data$type)
                               #levels = names(sort(table(full_beer_data$type))))
 
 class(full_beer_data$type)
+
+
 
 ##########################################################################################
 ##Visualize the data ----
@@ -317,3 +318,199 @@ ggplotly(full_beer_data %>% group_by(type) %>% ggplot(aes(x = alcohol_percent,
                               y = average_ratings, 
                               color = type)) + 
                               geom_point(alpha = 0.5))
+
+#################################################################################################
+full_beer_data <- full_beer_data %>% relocate(brewer, .after = beer)
+################################################################################################
+
+## Extract the brewers name----
+full_beer_data$brewer <- NA
+##Toppling Goliath Brewing company ----
+full_beer_data$brewer <- NA
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                        str_detect(full_beer_data$beer, "Toppling Goliath Brewing Company"), 
+                        "Toppling Goliath Brewing Company", full_beer_data$brewer)
+
+## 3 Floyds Brewing Co.
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                          str_detect(full_beer_data$beer, "3 Floyds Brewing Co."), 
+                         "3 Floyds Brewing Co.", full_beer_data$brewer)
+
+## Perennial Artisan Ales
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, "Perennial Artisan Ales"), 
+                                "Perennial Artisan Ales", full_beer_data$brewer)
+
+## Cigar City Brewing
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, "Cigar City Brewing"), 
+                                "Cigar City Brewing", full_beer_data$brewer)
+
+
+## The Alchemist
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, "The Alchemist"), 
+                                "The Alchemist", full_beer_data$brewer)
+
+## Russian River Brewing Company
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "Russian River Brewing Company"), 
+                                "Russian River Brewing Company", 
+                                full_beer_data$brewer)
+## Tree House Brewing Company
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                 "Tree House Brewing Company"), 
+                                "Tree House Brewing Company", 
+                                full_beer_data$brewer)
+
+## Goose Island Beer Co.
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "Goose Island Beer Co."), 
+                                "Goose Island Beer Co.", 
+                                full_beer_data$brewer)
+## Bottle Logic Brewing
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "Bottle Logic Brewing"), 
+                                "Bottle Logic Brewing", 
+                                full_beer_data$brewer)
+# Founders Brewing Company
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "Founders Brewing Company"), 
+                                "Founders Brewing Company", 
+                                full_beer_data$brewer)
+
+## Brasserie Cantillon
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                str_detect(full_beer_data$beer, 
+                                "Brasserie Cantillon"), 
+                                "Brasserie Cantillon", 
+                                full_beer_data$brewer)
+## Lawson's Finest Liquids
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "Lawson's Finest Liquids"), 
+                                "Lawson's Finest Liquids", 
+                                full_beer_data$brewer)
+## Brouwerij 3 Fonteinen
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "Brouwerij 3 Fonteinen"), 
+                                "Brouwerij 3 Fonteinen", 
+                                full_beer_data$brewer)
+
+## Hill Farmstead Brewery
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "Hill Farmstead Brewery"), 
+                                "Hill Farmstead Brewery", 
+                                full_beer_data$brewer)
+
+## Brouwerij Westvleteren (Sint-Sixtusabdij van Westvleteren)
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "Brouwerij Westvleteren \\(Sint-Sixtusabdij van Westvleteren\\)"), 
+                                "Brouwerij Westvleteren (Sint-Sixtusabdij van Westvleteren)", 
+                                full_beer_data$brewer)
+
+## Angry Chair Brewing
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "Angry Chair Brewing"), 
+                                "Angry Chair Brewing", 
+                                full_beer_data$brewer)
+
+## Maine Beer Company
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "Maine Beer Company"), 
+                                "Maine Beer Company", 
+                                full_beer_data$brewer)
+
+## The Lost Abbey
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "The Lost Abbey"), 
+                                "The Lost Abbey", 
+                                full_beer_data$brewer)
+
+## Firestone Walker Brewing Co.
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "Firestone Walker Brewing Co."), 
+                                "Firestone Walker Brewing Co.", 
+                                full_beer_data$brewer)
+
+## Trillium Brewing Company
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "Trillium Brewing Company"), 
+                                "Trillium Brewing Company", 
+                                full_beer_data$brewer)
+
+## Smith Brewing Company
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "Smith Brewing Company"), 
+                                "Smith Brewing Company", 
+                                full_beer_data$brewer)
+
+## Funky Buddha Brewery
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "Funky Buddha Brewery"), 
+                                "Funky Buddha Brewery", 
+                                full_beer_data$brewer)
+
+## Sante Adairius Rustic Ales
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                str_detect(full_beer_data$beer, 
+                                "Sante Adairius Rustic Ales"), 
+                                "Sante Adairius Rustic Ales", 
+                                full_beer_data$brewer)
+
+## Side Project Brewing
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "Side Project Brewing"), 
+                                "Side Project Brewing", 
+                                full_beer_data$brewer)
+
+## Jester King Brewery
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "Jester King Brewery"), 
+                                "Jester King Brewery", 
+                                full_beer_data$brewer)
+
+## Kern River Brewing Company
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "Kern River Brewing Company"), 
+                                "Kern River Brewing Company", 
+                                full_beer_data$brewer)
+
+## Bissell Brothers Brewing Co.
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "Bissell Brothers Brewing Co."), 
+                                "Bissell Brothers Brewing Co.", 
+                                full_beer_data$brewer)
+
+## Premierede Garde Brewing
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "Premierede Garde Brewing"), 
+                                "Premierede Garde Brewing", 
+                                full_beer_data$brewer)
+
+## The Bruery
+full_beer_data$brewer <- ifelse(is.na(full_beer_data$brewer) & 
+                                  str_detect(full_beer_data$beer, 
+                                "The Bruery"), 
+                                "The Bruery", 
+                                full_beer_data$brewer)
