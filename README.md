@@ -6,3 +6,5 @@ The data had the columns for beer name, brewers name, beer type, alcohol content
 The challenge is to separate the data and get a clean set that has the columns separate. 
 
 I am adding a new line
+
+I am adding a second new line
